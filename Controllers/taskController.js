@@ -3,7 +3,7 @@ const appError = require('../Utility/appError');
 
 
 exports.home = (req, res) => {
-    res.send({status: 'success', task: 'Welcome to home page'});
+    res.status(200).send(`<h1>Welcome to home page!</h1>`);
 }
 
 
