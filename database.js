@@ -3,8 +3,12 @@ const dotenv = require('dotenv');
 
 dotenv.config({ path: './config.env'});
 
+const DB = process.env.DB_URL.replace(
+    '<PASSWORD>',
+    process.env.DB_PASSWORD
+  );
 
-mongoose.connect(process.env.DB_URL,
+mongoose.connect(DB,
 {
     useNewUrlParser:true,
     useUnifiedTopology:true
