@@ -30,5 +30,5 @@ app.all('*', (req, res, next)=>{
 //Global Error handling middleware:
 app.use(errController);
 
-const port = 8000 || process.env.PORT;
+const port = process.env.PORT || 8000;
 app.listen(port, ()=> console.log(`server running at port: ${port}`));
