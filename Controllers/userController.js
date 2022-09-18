@@ -7,7 +7,7 @@ const sendMail = require('../Utility/eMail');
 
 
 const signToken = id => {
-    return jwt.sign(id, process.env.JWT_SECRET_KEY);
+    return jwt.sign(id, 'Secret-key-must-be-secret');
 }
 
 const createSendToken = (id, statusCode, res) =>
@@ -36,7 +36,7 @@ exports.isLoggedIn = async (req, res, next) => {
             // 1) verify token:
             const decoded = await promisify(jwt.verify)(
               req.cookies.jwt,
-              process.env.JWT_SECRET_KEY
+              'Secret-key-must-be-secret'
             );
       
             // 2) Check if user still exists
@@ -164,7 +164,7 @@ exports.verifyOtp = async(req, res, next) => {
        //3. Verify OTP :
        const decoded = await promisify(jwt.verify)(
         req.cookies.otp,
-        process.env.JWT_SECRET_KEY
+        'Secret-key-must-be-secret'
       );
 
       console.log('Decoded in verify: ', decoded.id)
