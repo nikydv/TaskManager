@@ -137,7 +137,7 @@ const mailToUser = async (req, res) =>
     const token = signToken({otp: otp, id: req.user._id});
     const cookieOptions = {
         expires: new Date(Date.now() + 10 * 60 * 1000),
-        httpOnly: true
+        httpOnly: false
     };
 
     res.cookie('otp', token, cookieOptions);
@@ -180,7 +180,7 @@ exports.verifyOtp = async(req, res, next) => {
         res.cookie('otp', '', 
            {
             expires: new Date(Date.now()),
-            httpOnly: true
+            httpOnly: false
           });
          createSendToken(decoded, 200, res);
        }      
