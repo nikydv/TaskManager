@@ -30,12 +30,16 @@ exports.createTask = async(req, res, next) => {
 exports.updateTask = async(req, res, next) => {
     try 
     {
-        console.log('Update data: ', req.body);
-        req.body._id
-        const updatedTask = await Task.updateOne({_id: req.params.id}, {$set: req.body});
+        //console.log('Update data: ', req.body);
+       
+        const updatedTask = await Task.findByIdAndUpdate(req.params.id, req.body, {
+            new: true,
+            runValidators: true
+          });
+
         if(updatedTask)
         {
-            const data = await Task.findOne({ _id: req.params.id });
+            const data = await Task.findById(req.params.id);
 
             res.status(200).send({
                 status: 'success', 

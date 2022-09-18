@@ -1,6 +1,5 @@
 const User = require('../Models/userModel');
 const appError = require('../Utility/appError');
-const crypto = require('crypto');
 const { promisify } = require('util');
 const jwt = require('jsonwebtoken');
 const sendMail = require('../Utility/eMail');
@@ -8,7 +7,7 @@ const sendMail = require('../Utility/eMail');
 
 
 const signToken = id => {
-    return jwt.sign(id, 'Secret-key-must-be-secret');
+    return jwt.sign(id, process.env.JWT_SECRET_KEY);
 }
 
 const createSendToken = (id, statusCode, res) =>
@@ -37,18 +36,18 @@ exports.isLoggedIn = async (req, res, next) => {
             // 1) verify token:
             const decoded = await promisify(jwt.verify)(
               req.cookies.jwt,
-              'Secret-key-must-be-secret'
+              process.env.JWT_SECRET_KEY
             );
       
             // 2) Check if user still exists
-            console.log('Decoded in LoggedIn: ', decoded);
+            //console.log('Decoded in LoggedIn: ', decoded);
             const currentUser = await User.findById(decoded.id.id);
             if (!currentUser) {
               return next( new appError('No user find for this token! pls logIn again.', 404));
             }
               
             //3) THERE IS A LOGGED IN USER
-            console.log("LoggedIn User: ", currentUser);
+            //console.log("LoggedIn User: ", currentUser);
             req.user = currentUser;
             return next();  
 
@@ -71,10 +70,6 @@ exports.signUp = async (req, res, next) => {
     {
         console.log(req.body);
         const newUser = await User.create(req.body);
-        // res.status(200).send({
-        //     status: 'success',
-        //     data: { newUser }
-        // })
         createSendToken(newUser, 202, res)
 
     } catch (error) 
@@ -120,7 +115,6 @@ const mailToUser = async (req, res) =>
 {
        const otp = parseInt(Math.random() * 100000);
        const sub = 'Otp for LogIn to TskMgr is:'
-       //const msg = `Dear User, Your OTP is: ${otp}. pls use this to complete your logIn.`
        const msg = "<p> Dear User, </p>"+
        "<p>OTP for account verification is: <br/>" + 
        "<span style='font-weight:bold;color: green'>" + otp + "</span>" +
@@ -170,7 +164,7 @@ exports.verifyOtp = async(req, res, next) => {
        //3. Verify OTP :
        const decoded = await promisify(jwt.verify)(
         req.cookies.otp,
-        'Secret-key-must-be-secret'
+        process.env.JWT_SECRET_KEY
       );
 
       console.log('Decoded in verify: ', decoded.id)
