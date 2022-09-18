@@ -31,4 +31,4 @@ app.all('*', (req, res, next)=>{
 app.use(errController);
 
 const port = 8000 || process.env.port;
-app.listen(port, ()=> console.log('server running at port: 8000'));
+app.listen(port, ()=> console.log(`server running at port: ${8000 || process.env.port}`));
