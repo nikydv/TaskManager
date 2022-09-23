@@ -69,12 +69,19 @@ exports.signUp = async (req, res, next) => {
     try 
     {
         console.log(req.body);
+
+        const checkUser = await User.find({email: req.body.email})
+        if(checkUser)
+        {
+            return next(new appError(`User already exist with the email: ${req.body.email}, pls use another email`, 404));
+        }
+
         const newUser = await User.create(req.body);
-        createSendToken(newUser, 202, res)
+        createSendToken(newUser._id, 202, res)
 
     } catch (error) 
     {
-        console.log("Error in signUp: ", error.stack);
+        console.log("Error in signUp: ", error);
         next(new appError('Getting error while signingUp', 404))
     }
 }
@@ -123,7 +130,7 @@ const mailToUser = async (req, res) =>
        " TskMgr Team </p>"
    
        await sendMail({
-           email: 'nik@yadu.com',
+           email: 'amanyadav50586@gmail.com',
            subject: sub,
            message: msg
        })
