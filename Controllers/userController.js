@@ -189,7 +189,6 @@ exports.verifyOtp = async(req, res, next) => {
          createSendToken(decoded, 200, res);
        }else
        {
-        console.log("Error in LogIn: ", error)
         next(new appError('Wrong OTP, Pls provide correct one!', 400));
        }      
 
