@@ -13,9 +13,8 @@ const signToken = id => {
 const createSendToken = (id, statusCode, res) =>
 {
     const token = signToken({id: id});
-    //const time = Date.now() + process.env.JWT_Cookie_ExpiresIn * 24 * 60 * 60 * 1000;
     const cookieOptions = {
-        expires: new Date(Date.now() + 30 * 60 * 1000),
+        expires: new Date(Date.now() + 10 * 60 * 1000),
         httpOnly: false
     };
 
@@ -40,7 +39,7 @@ exports.isLoggedIn = async (req, res, next) => {
             );
       
             // 2) Check if user still exists
-            //console.log('Decoded in LoggedIn: ', decoded);
+            console.log('Decoded in LoggedIn: ', decoded);
             const currentUser = await User.findById(decoded.id.id);
             if (!currentUser) {
               return next( new appError('No user find for this token! pls logIn again.', 404));
@@ -71,13 +70,17 @@ exports.signUp = async (req, res, next) => {
         console.log(req.body);
 
         const checkUser = await User.find({email: req.body.email})
-        if(checkUser)
+        //console.log('SignUp user: ', checkUser);
+
+        if(checkUser.length>0)
         {
             return next(new appError(`User already exist with the email: ${req.body.email}, pls use another email`, 404));
         }
 
         const newUser = await User.create(req.body);
-        createSendToken(newUser._id, 202, res)
+        req.user = newUser;
+
+        mailToUser(req, res);
 
     } catch (error) 
     {
@@ -130,14 +133,14 @@ const mailToUser = async (req, res) =>
        " TskMgr Team </p>"
    
        await sendMail({
-           email: 'amanyadav50586@gmail.com',
+           email: req.user.email,
            subject: sub,
            message: msg
        })
 
     const token = signToken({otp: otp, id: req.user._id});
     const cookieOptions = {
-        expires: new Date(Date.now() + 10 * 60 * 1000),
+        expires: new Date(Date.now() + 5 * 60 * 1000),
         httpOnly: false
     };
 
