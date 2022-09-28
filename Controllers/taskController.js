@@ -31,20 +31,27 @@ exports.updateTask = async(req, res, next) => {
     try 
     {
         //console.log('Update data: ', req.body);
-       
-        const updatedTask = await Task.findByIdAndUpdate(req.params.id, req.body, {
-            new: true,
-            runValidators: true
-          });
+        const tasks = await Task.find({ createdBy: req.user._id }, { _id: 1 });        
+        let tasksArr = tasks.map((x)=>x._id.toString());
+        //console.log('Tasks: ', tasksArr);
 
-        if(updatedTask)
+
+        if(tasksArr.includes(req.params.id))
         {
+            const updatedTask = await Task.findByIdAndUpdate(req.params.id, req.body, {
+                new: true,
+                runValidators: true
+              });
+
             const data = await Task.findById(req.params.id);
 
             res.status(200).send({
                 status: 'success', 
                 data 
                 });
+        }else
+        {
+            return next(new appError('Not authorised to updatte this task!', 401));
         }
         
 

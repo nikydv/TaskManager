@@ -39,7 +39,7 @@ exports.isLoggedIn = async (req, res, next) => {
             );
       
             // 2) Check if user still exists
-            console.log('Decoded in LoggedIn: ', decoded);
+            //console.log('Decoded in LoggedIn: ', decoded);
             const currentUser = await User.findById(decoded.id.id);
             if (!currentUser) {
               return next( new appError('No user find for this token! pls logIn again.', 404));
@@ -157,7 +157,7 @@ exports.verifyOtp = async(req, res, next) => {
     try 
     {
         //const { otp } = req.body;
-        console.log("Received otp: ", req.body.otp)
+        //console.log("Received otp: ", req.body.otp)
 
        //1. Check if -token exists
        if (!req.cookies.otp)
@@ -177,7 +177,7 @@ exports.verifyOtp = async(req, res, next) => {
         'Secret-key-must-be-secret'
       );
 
-      console.log('Decoded in verify: ', decoded.id)
+      //console.log('Decoded in verify: ', decoded.id)
        if(decoded.otp == req.body.otp)
        {
         console.log('user: ', decoded.id);
