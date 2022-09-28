@@ -16,8 +16,8 @@ const taskSchema = mongoose.Schema({
     status:
     {
         type: String,
-        default: 'Incompleted',
-        enum: ['Completed', 'Incompleted']
+        enum: ['Completed', 'Incomplete'],
+        required: [true, 'Pls provide task status']
     },
     createdBy:
     {
