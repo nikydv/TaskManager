@@ -4,9 +4,30 @@ const { promisify } = require('util');
 const jwt = require('jsonwebtoken');
 const { mailToUser } = require('./Utility/sendMail')
 const { createSendToken } = require('./Utility/token')
-const { logIn } = require('./Validation/authValidation')
+const { logIn, verifyOtp, signUp } = require('./Validation/authValidation');
+const { throws } = require('assert');
+const AppError = require('../Utility/appError');
 
 
+exports.userSignUp = (req, res, next)=>{
+    try 
+    {
+        const data = signUp(req, res, next)
+                        .then(async (data)=>
+                        {
+                            newUser = await User.create(req.body);
+                            req.user = newUser; 
+                            mailToUser(req, res);           
+                        }, 
+                        (err)=>next(new AppError(err, 404)))      
+        
+    } catch (error) 
+    {
+        console.log("Error in signUp: ", error);
+        next(new appError('Getting error while signingUp', 404))
+    }
+}
+/*
 exports.signUp = async (req, res, next) => {
     try 
     {
@@ -31,11 +52,12 @@ exports.signUp = async (req, res, next) => {
         next(new appError('Getting error while signingUp', 404))
     }
 }
+*/
 
 exports.userLogIn = (req, res, next) => {
     try 
     {
-       logIn(req, res, next).then((user)=>{
+        logIn(req, res, next).then((user)=>{
             req.user = user;
             mailToUser(req, res);
        })
@@ -46,7 +68,6 @@ exports.userLogIn = (req, res, next) => {
         next(new AppError('Something wrong while logginIn', 400));
     }
 }
-
 /*
 exports.logIn = async(req, res, next) => {
     try 
@@ -82,7 +103,29 @@ exports.logIn = async(req, res, next) => {
 
 */
 
+exports.verifyUserOtp = (req, res, next) => {
+    try 
+    {
+        verifyOtp(req, res, next)
+          .then((decoded)=>
+          {
+            res.cookie('otp', '', 
+            {
+                expires: new Date(Date.now()),
+                httpOnly: false
+            });
+            createSendToken(decoded, 200, res) 
+          })
+       
+    } catch (error) 
+    {
+        console.log("Error in LogIn: ", error)
+        next(new AppError('Something wrong while logginIn', 400));
+    }
+}
 
+
+/*
 exports.verifyOtp = async(req, res, next) => {
     try 
     {
@@ -128,6 +171,7 @@ exports.verifyOtp = async(req, res, next) => {
         next(new appError('Something wrong while logginIn', 400));
     }
 }
+*/
 
 
 
@@ -136,7 +180,7 @@ exports.logOut = async(req, res, next) => {
     {
         res.cookie('jwt', 'loggedout', 
            {
-            expires: new Date(Date.now() + 3 * 1000),
+            expires: new Date(Date.now()),
             httpOnly: true
           });
         
