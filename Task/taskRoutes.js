@@ -1,18 +1,18 @@
 const express = require('express');
 const taskController = require('./taskController');
-const userController = require('../User/userController');
+const loggedInValadation = require('../User/Validation/loggedInValidation');
 
 const router = express.Router();
 
 router.get('/', taskController.home)
   
 
-router.post('/addTask', userController.isLoggedIn, taskController.createTask)  
+router.post('/addTask', loggedInValadation.isLoggedIn, taskController.createTask)  
 
-router.patch('/updateTask/:id', userController.isLoggedIn, taskController.updateTask) 
+router.patch('/updateTask/:id', loggedInValadation.isLoggedIn, taskController.updateTask) 
 
-router.delete('/delTask/:id', userController.isLoggedIn, taskController.deleteTask) 
+router.delete('/delTask/:id', loggedInValadation.isLoggedIn, taskController.deleteTask) 
 
-router.get('/getTasks', userController.isLoggedIn, taskController.getTasks)
+router.get('/getTasks', loggedInValadation.isLoggedIn, taskController.getTasks)
 
 module.exports = router;  

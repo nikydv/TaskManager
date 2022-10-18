@@ -9,7 +9,7 @@ router
 
 router
   .route('/logIn')
-  .post(userController.logIn); 
+  .post(userController.userLogIn); 
 
 router
   .route('/verify') 

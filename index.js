@@ -1,4 +1,4 @@
-require('./database');
+require('./Config/database');
 const express = require('express');
 const cookieParser = require('cookie-parser');
 const taskRoutes = require('./Task/taskRoutes');
@@ -26,4 +26,5 @@ app.all('*', (req, res, next)=>{
 app.use(errController);
 
 const port = process.env.PORT || 8000;
+
 app.listen(port, ()=> console.log(`server running at port: ${port}`));

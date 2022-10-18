@@ -2,66 +2,9 @@ const User = require('./userModel');
 const appError = require('../Utility/appError');
 const { promisify } = require('util');
 const jwt = require('jsonwebtoken');
-const sendMail = require('./Utility/eMail');
-
-
-
-const signToken = id => {
-    return jwt.sign(id, 'Secret-key-must-be-secret');
-}
-
-const createSendToken = (id, statusCode, res) =>
-{
-    const token = signToken({id: id});
-    const cookieOptions = {
-        expires: new Date(Date.now() + 10 * 60 * 1000),
-        httpOnly: false
-    };
-
-    res.cookie('jwt', token, cookieOptions);
-
-    res.status(statusCode).json({
-        status: 'success',
-        token
-    });
-};
-
-
-exports.isLoggedIn = async (req, res, next) => {
-    try 
-    {
-        if (req.cookies.jwt) 
-        {
-            // 1) verify token:
-            const decoded = await promisify(jwt.verify)(
-              req.cookies.jwt,
-              'Secret-key-must-be-secret'
-            );
-      
-            // 2) Check if user still exists
-            //console.log('Decoded in LoggedIn: ', decoded);
-            const currentUser = await User.findById(decoded.id.id);
-            if (!currentUser) {
-              return next( new appError('No user find for this token! pls logIn again.', 404));
-            }
-              
-            //3) THERE IS A LOGGED IN USER
-            //console.log("LoggedIn User: ", currentUser);
-            req.user = currentUser;
-            return next();  
-
-        }else{
-            next(new appError('Pls LogIn first, to perform this action', 404));
-        }
-
-    } catch (error) 
-    {
-        console.log('Errror in isLoggedIn User: ', error);
-        next(new appError('Pls LogIn first!', 404));
-    }
-    
-};
-
+const { mailToUser } = require('./Utility/sendMail')
+const { createSendToken } = require('./Utility/token')
+const { logIn } = require('./Validation/authValidation')
 
 
 exports.signUp = async (req, res, next) => {
@@ -89,6 +32,22 @@ exports.signUp = async (req, res, next) => {
     }
 }
 
+exports.userLogIn = (req, res, next) => {
+    try 
+    {
+       logIn(req, res, next).then((user)=>{
+            req.user = user;
+            mailToUser(req, res);
+       })
+       
+    } catch (error) 
+    {
+        console.log("Error in LogIn: ", error)
+        next(new AppError('Something wrong while logginIn', 400));
+    }
+}
+
+/*
 exports.logIn = async(req, res, next) => {
     try 
     {
@@ -121,36 +80,7 @@ exports.logIn = async(req, res, next) => {
     }
 }
 
-const mailToUser = async (req, res) => 
-{
-       const otp = parseInt(Math.random() * 100000);
-       const sub = 'Otp for LogIn to TskMgr is:'
-       const msg = "<p> Dear User, </p>"+
-       "<p>OTP for account verification is: <br/>" + 
-       "<span style='font-weight:bold;color: green'>" + otp + "</span>" +
-       "<br/> Pls use this before it gets expired. </p>" +
-       "<p> Thanks and Regards,<br/>" +
-       " TskMgr Team </p>"
-   
-       await sendMail({
-           email: req.user.email,
-           subject: sub,
-           message: msg
-       })
-
-    const token = signToken({otp: otp, id: req.user._id});
-    const cookieOptions = {
-        expires: new Date(Date.now() + 5 * 60 * 1000),
-        httpOnly: false
-    };
-
-    res.cookie('otp', token, cookieOptions);
-       res.status(200).json({
-           status: 'success',
-           message: `OTP sent to mail ${req.body.email}`
-       }) 
-}
-
+*/
 
 
 exports.verifyOtp = async(req, res, next) => {
