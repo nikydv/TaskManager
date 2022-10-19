@@ -2,25 +2,21 @@ const mongoose = require('mongoose');
 const validator = require('validator');
 
 const taskSchema = mongoose.Schema({
-    date: 
-    {
+    date: {
         type: Date,        
         validate: [validator.isDate, 'pls provide date in yyyy/mm/dd format'],
         required: [true, 'Pls provide target date']
     },
-    task:
-    {
+    task: {
         type: String,
         required: [true, 'Pls provide task name']
     },
-    status:
-    {
+    status: {
         type: String,
         enum: ['Completed', 'Incomplete'],
         required: [true, 'Pls provide task status']
     },
-    createdBy:
-    {
+    createdBy: {
         type: mongoose.Schema.ObjectId,
         ref: 'Task'
     }

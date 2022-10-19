@@ -5,15 +5,15 @@ const router = express.Router();
 
 router
   .route('/signUp')
-  .post(userController.userSignUp);
+  .post(userController.signUp);
 
 router
   .route('/logIn')
-  .post(userController.userLogIn); 
+  .post(userController.logIn); 
 
 router
   .route('/verify') 
-  .post(userController.verifyUserOtp) 
+  .post(userController.verifyOtp) 
   
 router
   .route('/logOut')
