@@ -1,14 +1,25 @@
+const AppError = require('./appError')
 
 const sendErrorProd = (err, req, res) => {
   return res.status(err.statusCode).send({
-      status: err.status,
-      message: err.message
+    success: err.status,
+    message: err.message,
+    result: [],
   });
-}
+};
 
-module.exports = (error, req, res, next)=>{
+const handleValidationErrorDB = err => {
+  const errors = Object.values(err.errors).map(el => el.message);
+
+  const message = `Invalid input data. ${errors.join('. ')}`;
+  return new AppError(message, 400);
+};
+
+module.exports = (error, req, res, next) => {
   error.statusCode = error.statusCode || 500;
-  error.status = error.status || 'error';
+  error.status = error.status || false;
+  if (error.name === 'ValidationError'){
+    error = handleValidationErrorDB(error);
+  }
   sendErrorProd(error, req, res);
-}
-
+};
