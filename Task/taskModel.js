@@ -5,16 +5,16 @@ const taskSchema = mongoose.Schema({
     date: {
         type: Date,        
         validate: [validator.isDate, 'pls provide date in yyyy/mm/dd format'],
-        required: [true, 'Pls provide target date']
+        required: [true, 'Pls provide valid target date']
     },
     task: {
         type: String,
-        required: [true, 'Pls provide task name']
+        required: [true, 'Pls provide valid task name']
     },
     status: {
         type: String,
         enum: ['Completed', 'Incomplete'],
-        required: [true, 'Pls provide task status']
+        required: [true, 'Pls provide valid task status']
     },
     createdBy: {
         type: mongoose.Schema.ObjectId,
