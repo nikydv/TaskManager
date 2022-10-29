@@ -15,7 +15,9 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
-app.use(fileUpload());
+app.use(fileUpload({
+  limits: { fileSize: 10 * 1024 * 1024 }
+}));
 
 app.use("/", taskRoutes);
 app.use("/api/task", taskRoutes);
@@ -33,8 +35,6 @@ const port = process.env.PORT || 8000;
 app.listen(port, () => console.log(`server running at port: ${port}`));
 
 
-// 10mb
-// audio vedio csv
-// restriction: check file
+
 // upload and load delete
-// Handle error properly
+// filter based on fileType

@@ -2,6 +2,7 @@ const File = require("./fileModel");
 const appError = require("../Utility/appError");
 const { uploadeFiles, getFiles } = require("./fileValidation");
 
+//Function to upload files:
 exports.uploadeFiles = (req, res, next) => {
   uploadeFiles(req, res)
     .then((data) => {
@@ -17,34 +18,30 @@ exports.uploadeFiles = (req, res, next) => {
     .catch((err) =>  next(new appError(err, 400)));
 };
 
+//Function to return all required file's data:
 exports.getFiles = (req, res, next) => {
   console.log("Inside getFiles");
   getFiles(req, res)
-    .then((query) =>
-      File.find(query, {__v: 0})
-        .then((ans) => {
-          //console.log("Received data: ", ans);
-          if(ans.length!=0){
+    .then((filesData) =>{
+          if(filesData.length!=0){
             res
             .status(200)
             .json({
               success: true,
               message: "File's data received successfully!",
-              totalFilesCount: ans.length,
-              result: ans,
-            });
+              totalFilesCount: filesData.length,
+              result: filesData,
+            })
           }else{
             res
             .status(400)
             .json({
               success: false,
               message: "No record found!",
-              totalFilesCount: ans.length,
-              result: ans,
+              totalFilesCount: filesData.length,
+              result: filesData,
             });
           }
-          
-        })
-    )
-    .catch((err) => next(new appError(err, 400)));
+      })
+    .catch((err) => {console.log('error cast: ', err); next(new appError(err, 400))});
 };
